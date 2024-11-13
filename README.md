@@ -43,9 +43,9 @@
 - As a result, there was a need to find a solution for updating scenes in real projects and found an explicit method and implemented it.
 - During this process, a positive side effect was the removal of the SetPlayPosition function, which had been habitually overused in the existing code.
 
-### Topics
+#### Issues & Topics
 <details>
-  <summary>Interrogator and constraint</summary>
+  <summary>  Interrogator and constraint</summary>
 </details>
 <details>
   <summary>Issue: Considering the navigation system</summary>
@@ -69,12 +69,10 @@
 - Before the detailed planning phase, I was responsible for planning, designing, and verifying the Proof of Concept (POC) for the project.
 - After successfully completing the POC, I handed over the project to the remaining team members, ensuring a smooth transition, and concluded my participation in the project.
 
-### Topics
-
-### Issues
-
+#### Issues & Topics
 
 ---
+
 # Others, misc.
 - [Domain Setting Guide](https://github.com/dcode1119/DomainSettingGuide) - This page shows how to connect your domain to your github page(README.md)
 - [WaveFunc](https://github.com/dcode1119/WaveFunc) - WaveExec.cpp shows how to generate a PCM wave format file.
