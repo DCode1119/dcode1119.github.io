@@ -12,25 +12,25 @@
 
 #### Issues & Topics
 <details>
-  <summary>Shot parameter definitions</summary>
+  <summary>Shot parameter definitions(WIP)</summary>
 </details>
 <details>
-  <summary>AutoCamera, interfacing with LLM</summary>
+  <summary>AutoCamera, interfacing with LLM(WIP)</summary>
 </details>
 <details>
-  <summary>Implementing shot sequence generation</summary>
+  <summary>Implementing shot sequence generation(WIP)</summary>
 </details>
 <details>
-  <summary>Implementing MovieRenderQueue in CLI environment</summary>
+  <summary>Implementing MovieRenderQueue in CLI environment(WIP)</summary>
 </details>
 <details>
-  <summary>Issue: Implemention of synchronous(blocked) HTTP request & process with response</summary>
+  <summary>Issue: Implemention of synchronous(blocked) HTTP request & process with response(WIP)</summary>
 </details>
 <details>
-  <summary>Issue: Motion blur issue when cut change timing in shot sequence</summary>
+  <summary>Issue: Motion blur issue when cut change timing in shot sequence(WIP)</summary>
 </details>
 <details>
-  <summary>Issue: Screen snapshot with full lumen illumination applied was required</summary>
+  <summary>Issue: Screen snapshot with full lumen illumination applied was required(WIP)</summary>
 </details>
 
 ---
@@ -45,13 +45,13 @@
 
 #### Issues & Topics
 <details>
-  <summary>  Interrogator and constraint</summary>
+  <summary>  Interrogator and constraint(WIP)</summary>
 </details>
 <details>
-  <summary>Issue: Considering the navigation system</summary>
+  <summary>Issue: Considering the navigation system(WIP)</summary>
 </details>
 <details>
-  <summary>Issue: The finali animation update timing was far later(PostEval)</summary>
+  <summary>Issue: The finali animation update timing was far later(PostEval)(WIP)</summary>
 </details>
 
 ---
@@ -69,7 +69,7 @@
 - Before the detailed planning phase, I was responsible for planning, designing, and verifying the Proof of Concept (POC) for the project.
 - After successfully completing the POC, I handed over the project to the remaining team members, ensuring a smooth transition, and concluded my participation in the project.
 
-#### Issues & Topics
+#### Issues & Topics (WIP)
 
 ---
 
