@@ -1,7 +1,6 @@
 
-# List of contents
+# List of works
 
----
 
 ### The automatic cinematic camera system for unreal with LLM
 ##### Overview
