@@ -68,6 +68,8 @@
 - However, due to my departure from the project, I was unable to complete the development of the dedicated editor.
 - Before the detailed planning phase, I was responsible for planning, designing, and verifying the Proof of Concept (POC) for the project.
 - After successfully completing the POC, I handed over the project to the remaining team members, ensuring a smooth transition, and concluded my participation in the project.
+- I hope that the project members who took over the POC work have applied it to the content creation features they immediately needed, and that it has provided them with inspiration to establish a foundation for better functionality.
+
 
 #### Issues & Topics (WIP)
 
