@@ -1,5 +1,5 @@
 
-# The automatic cinematic camera system for unreal with LLM
+# Cinematic camera system with LLM
 ### Overview
 - This is part of an AI-based 3D video generation initiative that uses the Unreal Engine.
 - It focuses on abstracting the shot composition and directorial techniques commonly used in film theory.
