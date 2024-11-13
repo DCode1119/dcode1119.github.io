@@ -36,6 +36,21 @@
 - The finalized animation update timing
 
 
+### Groupped action system
+##### Overivew
+- This is a feature module that applies the animations of the entire project to characters through an Action System.
+- It is a data definition used to insert and configure actions for various characters, targeting different timings or conditions as required.
+- Since each individual group action has its own set of required parameters and execution timings, it was not feasible to design a single structure that could support everything.
+- With this in mind, we approached the problem by considering each group action as a small scene that defines its content, and grouping them into Blueprints.
+- Additionally, we wanted the actions to operate independently of any other calculations or custom logic.
+- This Blueprint was developed as a plugin to be used as an Asset Type, and the data format could be operated solely through GameplayTags within the plugin.
+- However, due to my departure from the project, I was unable to complete the development of the dedicated editor.
+
+##### Topics
+
+##### Issues
+
+
 ---
 ### Others, misc.
 - [Domain Setting Guide](https://github.com/dcode1119/DomainSettingGuide) - This page shows how to connect your domain to your github page(README.md)
