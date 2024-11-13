@@ -10,27 +10,27 @@
 - Through this system, I successfully integrated AI-driven camera movements into Unreal Engine’s LevelSequence, specifically within MovieScene, allowing for seamless and dynamic cinematography.
 - This enabled the automatic insertion of camera work, emulating real-world film production techniques, enhancing the cinematic experience.
 
-#### Issues & Topics
+#### Issues & Topics (WIP)
 <details>
-  <summary>Shot parameter definitions(WIP)</summary>
+  <summary>Shot parameter definitions</summary>
 </details>
 <details>
-  <summary>AutoCamera, interfacing with LLM(WIP)</summary>
+  <summary>AutoCamera, interfacing with LLM</summary>
 </details>
 <details>
-  <summary>Implementing shot sequence generation(WIP)</summary>
+  <summary>Implementing shot sequence generation</summary>
 </details>
 <details>
-  <summary>Implementing MovieRenderQueue in CLI environment(WIP)</summary>
+  <summary>Implementing MovieRenderQueue in CLI environment</summary>
 </details>
 <details>
-  <summary>Issue: Implemention of synchronous(blocked) HTTP request & process with response(WIP)</summary>
+  <summary>Issue: Implemention of synchronous(blocked) HTTP request & process with response</summary>
 </details>
 <details>
-  <summary>Issue: Motion blur issue when cut change timing in shot sequence(WIP)</summary>
+  <summary>Issue: Motion blur issue when cut change timing in shot sequence</summary>
 </details>
 <details>
-  <summary>Issue: Screen snapshot with full lumen illumination applied was required(WIP)</summary>
+  <summary>Issue: Screen snapshot with full lumen illumination applied was required</summary>
 </details>
 
 ---
@@ -43,15 +43,15 @@
 - As a result, there was a need to find a solution for updating scenes in real projects and found an explicit method and implemented it.
 - During this process, a positive side effect was the removal of the SetPlayPosition function, which had been habitually overused in the existing code.
 
-#### Issues & Topics
+#### Issues & Topics (WIP)
 <details>
-  <summary>  Interrogator and constraint(WIP)</summary>
+  <summary>  Interrogator and constraint</summary>
 </details>
 <details>
-  <summary>Issue: Considering the navigation system(WIP)</summary>
+  <summary>Issue: Considering the navigation system</summary>
 </details>
 <details>
-  <summary>Issue: The finali animation update timing was far later(PostEval)(WIP)</summary>
+  <summary>Issue: The finali animation update timing was far later(PostEval)</summary>
 </details>
 
 ---
