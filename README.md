@@ -1,14 +1,14 @@
 
 # Cinematic camera system with LLM
 ### Overview
-- This is part of an AI-based 3D video generation initiative that uses the Unreal Engine.
-- It focuses on abstracting the shot composition and directorial techniques commonly used in film theory.
-- Utilizing shot definitions designed to align with human cognition and directorial theories, the goal is to leverage the capabilities of a large language model (LLM) to create a more natural camera timeline by specifying appropriate camera direction based on the scene's context.
-- Additionally, it involves composing Shot Sequences and using them to build a MovieRenderQueue pipeline, as well as developing a CLI API to render LevelSequences through a Web API.
-- I was the key developer responsible for the core functionality of the cinematic camera system, utilizing Unreal Engine to design and implement the system.
-- I thoroughly analyzed real cinematic works to ensure that the camera work in the system was both natural and effective.
+- This system is part of an AI-based 3D video generation project using Unreal Engine.
+- It focuses on abstracting shot composition and directorial techniques commonly employed in film theory.
+- By using shot definitions designed to align with human cognition and directorial theories, the goal is to leverage the capabilities of a large language model (LLM) to create a more natural camera timeline that specifies appropriate camera direction based on the scene's context.
+- Additionally, the system involves creating Shot Sequences, building a MovieRenderQueue pipeline, and developing a CLI API to render LevelSequences through a Web API.
+- As the key developer responsible for the core functionality of the cinematic camera system, I utilized Unreal Engine to design and implement this system.
+- I designed the system’s camera work based on thorough analysis of real cinematic works, ensuring that the resulting implementation achieved a natural and effective outcome.
 - Through this system, I successfully integrated AI-driven camera movements into Unreal Engine’s LevelSequence, specifically within MovieScene, allowing for seamless and dynamic cinematography.
-- This enabled the automatic insertion of camera work, emulating real-world film production techniques, enhancing the cinematic experience.
+- This enabled the automatic insertion of camera work that emulates real-world film production techniques, enhancing the cinematic experience.
 
 #### Issues & Topics (WIP)
 <details>
@@ -16,23 +16,19 @@
 </details>
 <details>
   <summary>AutoCamera, interfacing with LLM</summary>
+  Issue: Implemention of synchronous(blocked) HTTP request & process with response
 </details>
 <details>
   <summary>Implementing shot sequence generation</summary>
 </details>
 <details>
   <summary>Implementing MovieRenderQueue in CLI environment</summary>
+  Issue: Motion blur issue when cut change timing in shot sequence
 </details>
 <details>
-  <summary>Issue: Implemention of synchronous(blocked) HTTP request & process with response</summary>
+  <summary>Misc</summary>
+  Issue: Screen snapshot with full lumen illumination applied was required
 </details>
-<details>
-  <summary>Issue: Motion blur issue when cut change timing in shot sequence</summary>
-</details>
-<details>
-  <summary>Issue: Screen snapshot with full lumen illumination applied was required</summary>
-</details>
-
 ---
 
 # Updating MovieScene in UE5
@@ -45,19 +41,15 @@
 
 #### Issues & Topics (WIP)
 <details>
-  <summary>  Interrogator and constraint</summary>
-</details>
-<details>
-  <summary>Issue: Considering the navigation system</summary>
-</details>
-<details>
-  <summary>Issue: The finali animation update timing was far later(PostEval)</summary>
+  <summary>Interrogator and constraint</summary>
+  Issue: Considering the navigation system<br>
+  Issue: The final animation update timing was far later(PostEval)
 </details>
 
 ---
 
 # Groupped action system
-### Overivew
+### Overview
 - This is part of an AI-based 3D video generation initiative that uses the Unreal Engine.
 - This is a feature module that applies the animations of the entire project to characters through an Action System.
 - It is a data definition used to insert and configure actions for various characters, targeting different timings or conditions as required.
