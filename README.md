@@ -1,74 +1,36 @@
-※ This page was created using GitHub - [link](https://github.com/dcode1119/dcode1119.github.io)
+# 주현철
 
-
-# Cinematic camera system with LLM
-### Overview
-- This system is part of an AI-based 3D video generation project using Unreal Engine.
-- It focuses on abstracting shot composition and directorial techniques commonly employed in film theory.
-- By using shot definitions designed to align with human cognition and directorial theories, the goal is to leverage the capabilities of a large language model (LLM) to create a more natural camera timeline that specifies appropriate camera direction based on the scene's context.
-- Additionally, the system involves creating Shot Sequences, building a MovieRenderQueue pipeline, and developing a CLI API to render LevelSequences through a Web API.
-- As the key developer responsible for the core functionality of the cinematic camera system, I utilized Unreal Engine to design and implement this system.
-- I designed the system’s camera work based on thorough analysis of real cinematic works, ensuring that the resulting implementation achieved a natural and effective outcome.
-- Through this system, I successfully integrated AI-driven camera movements into Unreal Engine’s LevelSequence, specifically within MovieScene, allowing for seamless and dynamic cinematography.
-- This enabled the automatic insertion of camera work that emulates real-world film production techniques, enhancing the cinematic experience.
-
-#### Issues & Topics (WIP)
-<details>
-  <summary>Shot parameter definitions</summary>
-</details>
-<details>
-  <summary>AutoCamera, interfacing with LLM</summary>
-  Issue: Implemention of synchronous(blocked) HTTP request & process with response
-</details>
-<details>
-  <summary>Implementing shot sequence generation</summary>
-</details>
-<details>
-  <summary>Implementing MovieRenderQueue in CLI environment</summary>
-  Issue: Motion blur issue when cut change timing in shot sequence
-</details>
-<details>
-  <summary>Misc</summary>
-  Issue: Screen snapshot with full lumen illumination applied was required
-</details>
----
-
-# Updating MovieScene in UE5
-### Overview
-- This is part of an AI-based 3D video generation initiative that uses the Unreal Engine.
-- With the transition from UE4 to UE5, the update mechanism for the SequencePlayer has become almost entirely asynchronous.
-- Due to this, the ForceEvaluate, which was frequently used when computations needed to occur according to specific timeframes in the timeline, no longer performs the intended function (updating the scene).
-- As a result, there was a need to find a solution for updating scenes in real projects and found an explicit method and implemented it.
-- During this process, a positive side effect was the removal of the SetPlayPosition function, which had been habitually overused in the existing code.
-
-#### Issues & Topics (WIP)
-<details>
-  <summary>Interrogator and constraint</summary>
-  Issue: Considering the navigation system<br>
-  Issue: The final animation update timing was far later(PostEval)
-</details>
+17년 이상 경력의 C/C++ 소프트웨어 엔지니어입니다. 의료영상, 산업제어, 임베디드, 실시간 3D 콘텐츠 제작도구 등 다양한 도메인에서 제품 개발을 해왔습니다. 요구사항 분석부터 설계, 구현, 검증 및 운영까지 일관되게 책임지는 업무 방식을 유지하고 있습니다.
 
 ---
 
-# Groupped action system
-### Overview
-- This is part of an AI-based 3D video generation initiative that uses the Unreal Engine.
-- This is a feature module that applies the animations of the entire project to characters through an Action System.
-- It is a data definition used to insert and configure actions for various characters, targeting different timings or conditions as required.
-- Since each individual group action has its own set of required parameters and execution timings, it was not feasible to design a single structure that could support everything.
-- With this in mind, we approached the problem by considering each group action as a small scene that defines its content, and grouping them into Blueprints.
-- Additionally, we wanted the actions to operate independently of any other calculations or custom logic.
-- This Blueprint was developed as a plugin to be used as an Asset Type, and the data format could be operated solely through GameplayTags within the plugin.
-- However, due to my departure from the project, I was unable to complete the development of the dedicated editor.
-- Before the detailed planning phase, I was responsible for planning, designing, and verifying the Proof of Concept (POC) for the project.
-- After successfully completing the POC, I handed over the project to the remaining team members, ensuring a smooth transition, and concluded my participation in the project.
-- I hope that the project members who took over the POC work have applied it to the content creation features they immediately needed, and that it has provided them with inspiration to establish a foundation for better functionality.
+## 대표 프로젝트
 
+### [CinevStudio](./projects/cinevstudio.md)
 
-#### Issues & Topics (WIP)
+Unreal Engine 기반 3D 영상 콘텐츠 제작 소프트웨어. Camera Direction System, Sequence 편집, LLM 및 AI 모델 연동 기능을 설계하고 구현했습니다. AI 생성 결과물을 편집 가능한 제작 데이터로 변환하여 제작 파이프라인에 통합하는 구조를 적용했습니다.
+
+### [MediLabel On-premise](./projects/medilabel.md)
+
+인그래디언트(Ingradient)에서 개발한 딥러닝 기반 의료영상 Labeling 도구. 2D 슬라이스 기반 Annotation과 3D Volume 데이터 편집(Isocontour, Sculpting) 기능을 구현했습니다. TensorFlow AI 모델의 출력을 Label 데이터로 변환하는 레이어를 설계하여 모델 종류에 독립적인 통합 구조를 구성했습니다. (2022년 개발 중단으로 프로젝트 종료)
+
+### [GIPAM3000 전면 HMI](./projects/gipam-hmi.md)
+
+LS Electric GIPAM3000 디지털 전력보호 감시장치의 전면 HMI Application. Qt와 Embedded Linux 기반으로 보호계전기의 상태 표시, 보호 요소 설정 편집, MODBUS-TCP 통신 기능을 개발했습니다. Source Insight 정적 분석과 고객사 QA 협력을 통한 장시간 신뢰성 검증을 수행했습니다.
 
 ---
 
-# Others, misc.
-- [Domain Setting Guide](https://github.com/dcode1119/DomainSettingGuide) - This page shows how to connect your domain to your github page(README.md)
-- [WaveFunc](https://github.com/dcode1119/WaveFunc) - WaveExec.cpp shows how to generate a PCM wave format file.
+## Engineering
+
+제품 개발에서 중요하게 생각하는 것은 문제를 어떤 레이어에서 해결할지 결정하는 것입니다. 동일한 기능 요구라도 데이터 모델, 통신 인터페이스, 사용자 경험 중 어느 계층에서 해결하느냐에 따라 시스템의 유지보수성과 확장성이 달라집니다.
+
+2D-3D 데이터 간 일관성 유지, AI 모델 출력과 제작 데이터 간 변환 레이어 분리, 교차 플랫폼 추상화 — 이 구조적 결정들이 시간이 지나면서 시스템의 변경 비용을 결정했습니다.
+
+---
+
+## AI / Agent
+
+최근 생성형 AI와 Agent 기반 개발 방식에 관심을 가지고 있습니다. LLM Function Calling을 활용하여 AI 모델의 출력을 구조화된 제작 명령어로 변환하고, 이를 제작 파이프라인에 통합한 경험이 있습니다. Agent를 통한 개발 자동화 및 워크플로우 통합을 실무에 적용 중입니다.
+
+---
+
