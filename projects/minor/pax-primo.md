@@ -13,7 +13,7 @@
 
 > 후속모델(PaX-i) 출시로 단종된 제품이다.
 
-![PaX-Primo](../assets/images/pax-primo.png)
+![PaX-Primo](../../assets/images/pax-primo.png)
 
 ## 프로젝트 배경
 

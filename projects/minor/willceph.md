@@ -11,7 +11,7 @@
 
 ---
 
-![WillCeph](../assets/images/willceph-screenshot.jpeg)
+![WillCeph](../../assets/images/willceph-screenshot.jpeg)
 
 ## 프로젝트 배경
 
