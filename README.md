@@ -2,11 +2,9 @@
 
 ## Introduce
 
-| | |
-|---|---|
-| **Nickname** | DCode |
-| **Name** | 주현철 |
-| **Contact** | decaffeine@naver.com |
+- **Nickname**: DCode
+- **Name**: 주현철
+- **Contact**: decaffeine@naver.com
 
 ---
 
@@ -16,12 +14,12 @@
 |---|---|
 | **언어** | C/C++ |
 | **플랫폼 / 엔진** | Unreal Engine 4/5, Qt, MFC, Linux, Windows |
-| **도메인** | 의료영상, Realtime-3D, Applied AI |
+| **도메인** | Unreal Engine, AI/LLM 응용, 의료영상, 산업제어, 임베디드 |
 | **Etc** | Git, GitLab, Perforce, CI/CD |
 
 ---
 
-17년 이상 경력의 C/C++ 소프트웨어 엔지니어입니다. 의료영상, 산업제어, 임베디드, 실시간 3D 콘텐츠 제작도구 등 다양한 도메인에서 제품 개발을 해왔습니다. 요구사항 분석부터 설계, 구현, 검증 및 운영까지 일관되게 책임지는 업무 방식을 유지하고 있습니다.
+17년 이상 경력의 C/C++ 소프트웨어 엔지니어입니다. 임베디드 시스템에서 시작하여 의료영상, 산업제어를 거쳐 Unreal Engine 3D 제작도구와 AI/LLM 응용까지 도메인을 확장하며 제품을 개발해왔습니다. 분석, 설계, 구현, 검증, 운영 등 제품 전 과정을 고려하여 작업의 디테일을 정하고 의견을 교환하는 업무 스타일을 지향합니다.
 
 ---
 
@@ -33,9 +31,15 @@
 
 ---
 
-## AI / Agent
+## AI 모델 활용
 
-최근 생성형 AI와 Agent 기반 개발 방식에 관심을 가지고 있습니다. LLM Function Calling을 활용하여 AI 모델의 출력을 구조화된 제작 명령어로 변환하고, 이를 제작 파이프라인에 통합한 경험이 있습니다. Agent를 통한 개발 자동화 및 워크플로우 통합을 실무에 적용 중입니다.
+LLM 기반 제작 파이프라인(CinevStudio)과 학습모델 통합(MediLabel) 두 축으로 구성된다. CinevStudio에서는 LLM 기능의 REST API를 설계하고 AI 출력을 편집 가능한 제작 데이터로 변환하는 파이프라인을 구축했다. MediLabel에서는 TensorFlow 모델 출력을 Label 데이터로 변환하는 모델 독립적 레이어를 설계했다.
+
+---
+
+## Agent 기반 개발
+
+사내 트렌드에서 시작하여 퇴사 후 개인 Unreal Engine 프로젝트에서 직접 Agent 개발 환경을 구성해 운영 중이다. 계층화된 문서로 Agent 행동을 정의하고, Goal-Driven Execution, 작업 일지/세션 복원, Safeguard 자동화, knowledge graph(graphify) 기반 코드 분석을 적용하고 있다.
 
 ---
 

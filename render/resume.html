@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>주현철 · 이력서</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  @page { margin: 0; size: A4; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    font-size: 10pt;
+    line-height: 1.7;
+    color: #2d3436;
+    background: #edece7;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 0;
+    gap: 24px;
+  }
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    background: #fff;
+    box-shadow: 0 4px 24px rgba(0,0,0,.08);
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    overflow: hidden;
+  }
+  /* Sidebar */
+  .sidebar {
+    background: #4a7a8a;
+    color: #e8f0f0;
+    padding: 48px 24px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .sidebar .name {
+    font-size: 20pt;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: .04em;
+    line-height: 1.3;
+  }
+  .sidebar .title {
+    font-size: 9pt;
+    color: #b8d0d4;
+    font-weight: 400;
+    margin-top: -8px;
+  }
+  .sidebar .section-title {
+    font-size: 8.5pt;
+    font-weight: 700;
+    color: #d8e8ea;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    margin-bottom: 10px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+  }
+  .sidebar .contact-item {
+    font-size: 8.5pt;
+    line-height: 1.6;
+    color: #9ab8c0;
+    word-break: keep-all;
+  }
+  .sidebar .contact-item strong {
+    display: block;
+    font-size: 7.5pt;
+    color: #d8e8ea;
+    font-weight: 500;
+  }
+  .sidebar .skill-tag {
+    display: inline-block;
+    font-size: 7.5pt;
+    color: #d8e8ea;
+    background: rgba(255,255,255,.08);
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin: 2px 3px 2px 0;
+  }
+  .sidebar .skill-group {
+    margin-bottom: 10px;
+  }
+  .sidebar .skill-group-label {
+    font-size: 7.5pt;
+    color: #d8e8ea;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  /* Main */
+  .main {
+    padding: 48px 40px 36px 36px;
+  }
+  .resume-title {
+    font-size: 14pt;
+    font-weight: 700;
+    color: #4a7a8a;
+    letter-spacing: .06em;
+    margin-bottom: 16px;
+  }
+  .main .section {
+    margin-bottom: 22px;
+  }
+  .main .section-header {
+    font-size: 11pt;
+    font-weight: 700;
+    color: #4a7a8a;
+    letter-spacing: .04em;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #4a7a8a;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .main .section-header span {
+    font-size: 14pt;
+    font-weight: 300;
+    color: #4a90a0;
+  }
+
+  /* Summary */
+  .summary {
+    font-size: 9pt;
+    line-height: 1.8;
+    color: #5a6a72;
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    background: #edefea;
+    border-left: 3px solid #4a7a8a;
+    word-break: keep-all;
+  }
+
+  /* Experience */
+  .exp-item {
+    margin-bottom: 16px;
+    page-break-inside: avoid;
+  }
+  .exp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 2px;
+  }
+  .exp-company {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: #4a7a8a;
+  }
+  .exp-period {
+    font-size: 8.5pt;
+    color: #8a9a9a;
+    white-space: nowrap;
+  }
+  .exp-role {
+    font-size: 9pt;
+    color: #5a7a8a;
+    font-weight: 500;
+    margin-bottom: 4px;
+    word-break: keep-all;
+  }
+  .exp-desc {
+    font-size: 8.5pt;
+    color: #5a6a72;
+    line-height: 1.7;
+    padding-left: 0;
+    word-break: keep-all;
+  }
+  .exp-desc ul {
+    list-style: none;
+    padding: 0;
+  }
+  .exp-desc ul li {
+    position: relative;
+    padding-left: 14px;
+    margin-bottom: 2px;
+  }
+  .exp-desc ul li::before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    color: #4a90a0;
+    font-size: 8pt;
+  }
+
+  /* Project highlight */
+  .project-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 4px 0 6px;
+  }
+  .project-tags span {
+    font-size: 7pt;
+    color: #4a6a7a;
+    background: #f4f4f0;
+    padding: 1px 7px;
+    border-radius: 2px;
+  }
+
+  /* Education */
+  .edu-item {
+    font-size: 9pt;
+    color: #5a6a72;
+  }
+  .edu-item .edu-school {
+    font-weight: 600;
+  }
+  .edu-item .edu-meta {
+    font-size: 8pt;
+    color: #8a9a9a;
+  }
+  @media print {
+    body { background: #ffffff; padding: 0; }
+    .page { box-shadow: none; margin: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="sidebar">
+    <div>
+      <div class="name">주현철</div>
+      <div class="title">C/C++ Software Engineer · 17yr</div>
+    </div>
+
+    <div>
+      <div class="section-title">Contact</div>
+      <div class="contact-item"><strong>Email</strong>decaffeine@naver.com</div>
+      <div class="contact-item"><strong>Phone</strong>010-2094-4096</div>
+    </div>
+
+    <div>
+      <div class="section-title">Tech Stack</div>
+      <div class="skill-group">
+        <div class="skill-group-label">Primary</div>
+        <span class="skill-tag">Modern C/C++</span>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-label">Frameworks</div>
+        <span class="skill-tag">Unreal Engine 4/5</span>
+        <span class="skill-tag">Qt 5/6</span>
+        <span class="skill-tag">MFC</span>
+        <span class="skill-tag">VTK</span>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-label">Platforms</div>
+        <span class="skill-tag">Windows</span>
+        <span class="skill-tag">Linux</span>
+        <span class="skill-tag">Embedded Linux</span>
+        <span class="skill-tag">WinCE</span>
+      </div>
+      <div class="skill-group">
+        <div class="skill-group-label">Tools</div>
+        <span class="skill-tag">Git</span>
+        <span class="skill-tag">CMake</span>
+        <span class="skill-tag">CI/CD</span>
+        <span class="skill-tag">Perforce</span>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">Domains</div>
+      <span class="skill-tag">Medical Imaging</span>
+      <span class="skill-tag">Unreal Engine</span>
+      <span class="skill-tag">Embedded</span>
+      <span class="skill-tag">AI/LLM Applications</span>
+      <span class="skill-tag">Tooling</span>
+    </div>
+
+    <div>
+      <div class="section-title">Education</div>
+      <div class="skill-group">
+        <div class="skill-group-label">조선대학교</div>
+        <div style="font-size:8pt;color:#9ab8c0;line-height:1.5;">
+          인터넷소프트웨어공학 학사<br>
+          2001 — 2009
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="resume-title">이력서</div>
+    <div class="summary">
+       17년 이상 경력의 C/C++ 소프트웨어 엔지니어입니다. 임베디드 시스템에서 시작하여 의료영상, 산업제어를 거쳐 Unreal Engine 3D 제작도구와 AI/LLM 응용까지 도메인을 확장하며 제품을 개발해왔습니다. 분석, 설계, 구현, 검증, 운영 등 제품 전 과정을 고려하여 작업의 디테일을 정하고 의견을 교환하는 업무 스타일을 지향합니다.
+    </div>
+
+    <div class="section">
+      <div class="section-header"><span>01</span> 경력</div>
+
+      <div class="exp-item">
+        <div class="exp-header">
+          <div class="exp-company">시나몬스튜디오</div>
+          <div class="exp-period">2022.11 — 2026.03</div>
+        </div>
+        <div class="exp-role">시니어 프로그래머 (클라이언트 개발)</div>
+        <div class="project-tags"><span>Unreal Engine 4/5</span><span>C++</span><span>LLM</span><span>Git</span></div>
+        <div class="exp-desc">
+          <ul>
+            <li>CinevStudio — Unreal Engine 기반 3D 영상 콘텐츠 제작 소프트웨어 핵심 기능 설계 및 구현</li>
+            <li>Camera Direction System 설계·구현 (Shot 정의, AutoCamera, LLM 인터페이스)</li>
+            <li>LLM 및 AI 모델 연동 설계 및 제작 파이프라인 통합</li>
+            <li>UE4→UE5 마이그레이션 대응, CLI 기반 MovieRenderQueue 파이프라인 구축</li>
+            <li>Git 브랜치 전략 및 CI/CD 파이프라인 운영</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-header">
+          <div class="exp-company">인그래디언트 (Ingradient)</div>
+          <div class="exp-period">2020.04 — 2022.11</div>
+        </div>
+        <div class="exp-role">시니어 프로그래머 (온프레미스 제품 개발)</div>
+        <div class="project-tags"><span>Qt</span><span>VTK</span><span>TensorFlow</span><span>C++</span></div>
+        <div class="exp-desc">
+          <ul>
+            <li>MediLabel On-premise — Qt 기반 의료영상 Annotation 도구 개발</li>
+            <li>VTK 기반 3D Viewer, Isocontour/Sculpting 등 3D Label 편집 기능 구현</li>
+            <li>TensorFlow AI 모델 출력을 Label 데이터로 변환하는 통합 레이어 설계</li>
+            <li>REST API 기반 Cloud 서비스 연동</li>
+            <li>2D-3D 간 일관된 Label 데이터 모델 설계</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-header">
+          <div class="exp-company">하이버스 (Hybus)</div>
+          <div class="exp-period">2017.01 — 2020.03</div>
+        </div>
+        <div class="exp-role">개발팀장 과장 (LS Electric 외주 프로젝트)</div>
+        <div class="project-tags"><span>Qt</span><span>Embedded Linux</span><span>MODBUS-TCP</span><span>C++</span></div>
+        <div class="exp-desc">
+          <ul>
+            <li>GIPAM3000 전면 HMI — 전력보호감시장치 HMI Application 설계 및 구현</li>
+            <li>Windows + Embedded Linux 교차 플랫폼 대응</li>
+            <li>스크립트(CSV) 기반 동적 UI 구성, MODBUS-TCP 통신 모듈 구현</li>
+            <li>정적 분석(Source Insight) 및 고객사 QA 협업을 통한 신뢰성 검증</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-header">
+          <div class="exp-company">하이버스 (프리랜서)</div>
+          <div class="exp-period">2014.06 — 2016.12</div>
+        </div>
+        <div class="exp-role">MDEC 임베디드 SW 개발 (국책과제)</div>
+        <div class="project-tags"><span>C/C++</span><span>Linux</span><span>UART/USB</span><span>TCP/IP</span></div>
+        <div class="exp-desc">
+          <ul>
+            <li>CMCIS MDEC — 의료장비 프로토콜 변환 게이트웨이 임베디드 SW 개발</li>
+            <li>6종 의료장비 데이터 수신 → CMCIS 표준 프로토콜 변환</li>
+            <li>Linux 포팅, UART/USB 디바이스 연동, TCP/IP 전송 모듈 구현</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="sidebar">
+    <div>
+      <div class="name">주현철</div>
+      <div class="title">C/C++ Software Engineer · 17yr</div>
+    </div>
+    <div>
+      <div class="section-title">Contact</div>
+      <div class="contact-item"><strong>Email</strong>decaffeine@naver.com</div>
+      <div class="contact-item"><strong>Phone</strong>010-2094-4096</div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="section">
+      <div class="section-header" style="border-bottom-color:#dcdfd8;"><span>01</span> 경력 <span style="font-size:8.5pt;color:#8a9a9a;font-weight:400;">(계속)</span></div>
+
+      <div class="exp-item">
+        <div class="exp-header">
+          <div class="exp-company">윌메드 (HDX WILL)</div>
+          <div class="exp-period">2012.06 — 2014.03</div>
+        </div>
+        <div class="exp-role">개발팀 대리</div>
+        <div class="project-tags"><span>MFC</span><span>GDI+</span><span>C/C++</span><span>DICOM</span></div>
+        <div class="exp-desc">
+          <ul>
+            <li>WillCeph — 2D Cephalometric 분석 소프트웨어 (MFC Ribbon, GDI+)</li>
+            <li>Dentio — 파노라마+세팔로 통합 X선 장비 Image Chain 구현</li>
+            <li>Teledyne Dalsa CMOS 센서 협업, Calibration Application 개발</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-header">
+          <div class="exp-company">하이버스 (초기)</div>
+          <div class="exp-period">2010.04 — 2012.06</div>
+        </div>
+        <div class="exp-role">개발팀 사원</div>
+        <div class="project-tags"><span>C/C++</span><span>Embedded</span><span>Windows</span><span>PLC</span></div>
+        <div class="exp-desc">
+          <ul>
+            <li>PDK3200 — OLED/LCD Tester & Demo Kit (임베디드 + Windows 병행)</li>
+            <li>UFSN — 전자부품연구원(KETI) 지하시설물 센서 네트워크 시스템</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="exp-item">
+        <div class="exp-header">
+          <div class="exp-company">바텍 (Vatech)</div>
+          <div class="exp-period">2008.06 — 2010.03</div>
+        </div>
+        <div class="exp-role">개발팀 사원</div>
+        <div class="project-tags"><span>WinCE 5.0</span><span>FPGA</span><span>Embedded C/C++</span></div>
+        <div class="exp-desc">
+          <ul>
+            <li>PaX-Primo — 치과용 디지털 파노라마 X선 장비 임베디드 SW</li>
+            <li>FPGA 기반 Frame Grabber 구현, Ethernet 단일 인터페이스 구성</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+    <div style="text-align:right; margin-top:16px; padding-right:20px; font-size:8pt; color:#8a9a9a;">
+      Full Portfolio <a href="https://www.dcode.kr" style="color:#4a7a8a; text-decoration:none;">www.dcode.kr</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>
