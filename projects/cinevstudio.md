@@ -59,7 +59,8 @@ CINEV 서비스의 전체 흐름은 다음과 같다.
 - 설계
   - Camera Direction System 구조 설계 (Shot 정의, AutoCamera, LLM 인터페이스)
   - Sequence 기반 콘텐츠 생성 및 편집 데이터 구조 설계
-  - LLM 및 학습모델 연동을 위한 인터페이스 설계
+  - LLM 기능 REST API 설계 및 Data Schema 정의
+  - 학습모델 연동 인터페이스 설계
   - Grouped Action System의 Plugin 구조 설계 및 POC 검증
   - CLI 기반 MovieRenderQueue 파이프라인 설계
 
@@ -89,12 +90,17 @@ CINEV 서비스의 전체 흐름은 다음과 같다.
 
 ### Camera Direction System
 
-영상 콘텐츠 제작에서 카메라 워크는 내러티브의 중요한 요소다. 이 시스템은 사용자가 카메라의 경로, 속도, 시점을 시퀀스 내에서 조절할 수 있도록 했다.
+초기 Shot은 피사체 크기(1~9 양자화)와 피사체 기준 상대 Yaw/Pitch/FOV로 정의되어 Camera Transform으로 출력되었다. 연출/영상제작 직군의 대표적인 카메라 샷들로부터 파라미터를 역산하여 **Template Library**(DataTable, 30~300개 가변)로 구축하고 Tag(샷사이즈/방향/높이 3집합 조합)를 부여했다.
 
-- 기술 선택 이유: Unreal Engine의 Camera Actor 및 Spline 기반 이동 시스템을 재사용하되, 제품의 시퀀스 구조와 결합할 수 있도록 래핑
-- 구조: Camera Actor 방향/위치 데이터를 Sequence Keyframe 구조로 일반화하여 저장하고, 타임라인 기반으로 편집 가능
+이후 **Black-eye Plugin** 도입으로 Shot Size 양자화는 제거되고 **DesiredViewSize**(1~100 float, 피사체 화면 점유율 %)로 대체되었다.
 
-**Shot 정의와 AutoCamera.** 시스템은 실제 영상물 분석을 기반으로 Shot 매개변수를 정의했다. 영화 촬영 이론에서 사용되는 구도, 카메라 앵글, 움직임의 유형을 파라미터화하여 Shot 단위로 표현했다. AutoCamera는 이 Shot 정의를 바탕으로 장면의 맥락에 따라 적절한 카메라 방향을 자동으로 결정하는 시스템이다.
+**2인 이상 샷(OTS) 대응.** 기준 피사체를 선정하여 방향/Orient 기준을 설정하고, 피사체 간 거리/방향에 따른 **Restriction Rule**을 추가했다.
+
+**Obstacle 대응.** 피사체 안면부 ROI 기준 카메라 LineTrace로 가려짐을 판정했다.
+
+**Off-screen Sequence Evaluation.** 카메라 계산이 Off-screen에서 이루어져야 했으므로, 요청 Tick에 Sequence를 갱신하고 Tick 기반 애니메이션을 안정화(Stable Pose Detector)하여 특정 프레임의 정확한 캐릭터 모션을 도출했다.
+
+**Black-eye 연동.** Black-eye는 Tick base Damping 계산으로 자연스러운 카메라 이동을 제공했지만, Non-deterministic하여 MRQ의 Deterministic Sequence로 재현하기 어려웠다. PoC 단계에서 이 취약점을 보고했으나 강력한 요구로 플러그인 사용이 결정되어, Black-eye 카메라 타임라인 시퀀스를 Tick base 시뮬레이션 → Sampling → 일반 카메라 타임라인에 적용하는 방식으로 우회했다. Sampling 간격은 매 프레임에서 3프레임으로 조정하고 오차를 제시해 합의했으며, 간격은 파라미터화하여 추후 수정 가능하게 설계했다.
 
 ### Sequence 기반 콘텐츠 편집
 
@@ -109,74 +115,54 @@ LLM과 학습 모델을 제작 파이프라인에 통합하여 텍스트 기반 
 
 - 기술 선택 이유: 생성형 AI의 결과물을 단순한 참고자료가 아닌 편집 가능한 제작 데이터로 변환하여 파이프라인에 통합
 - 구조: AI 모델 호출 → 결과 파싱 → 제작 데이터 변환 → Sequence에 반영하는 단계적 인터페이스 구성
+- LLM 기능 REST API를 통해 요청/응답 데이터 구조 정의, AI 엔지니어 및 기획팀과 협의하여 명세 확정
 - LLM Function Calling을 활용하여 AI 모델의 출력을 구조화된 제작 명령어로 변환
 
 ### Grouped Action System
 
-캐릭터 애니메이션을 관리하는 Action System. 전체 프로젝트의 애니메이션을 캐릭터에 적용하기 위한 데이터 정의 모듈이다.
+두 캐릭터 이상의 애니메이션을 간편하게 배치하기 위한 시스템. 쌍으로 촬영된 **Animation Pair** 데이터에서 시작 지점의 **Relative Transform**을 도출하여, 사용자가 UI에서 원하는 위치를 지정하면 두 캐릭터의 Transform을 계산하고 타임라인에 같은 시점에 애니메이션 시퀀스를 삽입했다.
 
-- 기술 선택 이유: 각 Action 그룹마다 필요한 매개변수와 실행 타이밍이 달라 하나의 구조로 모든 것을 지원할 수 없었음. 각 Grouped Action을 콘텐츠를 정의하는 작은 Scene으로 간주하고 Blueprint로 그룹화하는 접근을 선택
-- 구조: Plugin 형태의 Asset Type으로 개발, 데이터 형식은 GameplayTags를 통해 조작 가능
-- 특이사항: 상세 기획 및 전용 에디터 개발은 진행 중 프로젝트 이탈로 POC 완료 후 팀에 이관
+POC 완료 후 팀에 이관했으며, 재입사 후 재담당했으나 회사 구조조정으로 실제 제품 적용까지는 도달하지 못했다.
 
 ### CLI 기반 렌더링 파이프라인
 
-MovieRenderQueue를 CLI 환경에서 구동하고, Web API를 통해 LevelSequence 렌더링을 요청할 수 있는 파이프라인.
-
-- 기술 선택 이유: 제품 내에서 직접 렌더링을 수행하지 않고 외부 파이프라인에서 Queue 기반으로 렌더링을 처리하기 위해 CLI 인터페이스가 필요
-- 구조: CLI API → MovieRenderQueue → LevelSequence 출력
+**2단계 Sequence 구조.** Actor 배치/애니메이션/편집을 위한 **SceneSequence**와, SceneSequence들의 카메라 컷을 자유롭게 배치하여 렌더링하기 위한 **RenderSequence**(UMovieSceneShotTrack)로 책임을 분리했다. MRQ는 RenderSequence를 소스로 사용하여 멀티 Scene을 넘나들며 렌더링했다. Camera Candidate Template 목록에 대한 렌더링도 포함했다.
 
 ---
 
 ## 설계 및 구현
 
-### Camera Direction System의 시퀀스 통합
+### Camera Direction System
 
-Camera Direction System을 단독 기능으로 구현하는 대신, 시퀀스 데이터 모델의 일부로 통합했다. 각 카메라 키프레임이 시퀀스 키프레임과 동일한 데이터 레이어에서 관리되도록 하여, 편집 UI에서 일관된 조작이 가능하게 했다.
+초기 Shot은 피사체 크기(1~9 양자화)와 피사체 기준 상대 Yaw/Pitch/FOV로 정의되었다. 연출/영상제작 직군의 대표적인 카메라 샷들로부터 파라미터를 역산하여 **Template Library**(DataTable)로 구축하고 Tag(샷사이즈/방향/높이 3집합 조합)를 부여했다.
 
-**Shot 정의와 영화 이론 기반 설계.** 실제 영상물을 분석하여 Shot 매개변수를 정의했다. 단순히 카메라 위치와 회전만이 아니라, 구도, 앵글, 움직임 유형 등 영화 촬영 이론에서 사용하는 개념을 파라미터화했다. AutoCamera는 이 Shot 정의와 장면 맥락을 입력받아 적절한 카메라 방향을 결정하는 규칙 기반 시스템으로, LLM이 결정한 Shot 의도를 실제 카메라 움직임으로 변환하는 중간 계층 역할을 했다.
+**Black-eye Plugin 도입.** Shot Size 양자화는 **DesiredViewSize**(1~100 float %)로 대체되었다. Black-eye는 Non-deterministic한 Tick base Damping 계산으로 MRQ의 Deterministic Sequence 재현이 어려웠으나, Tick base 시뮬레이션 → Sampling → 일반 카메라 타임라인 적용 방식으로 우회했다. Sampling 간격은 매 프레임에서 3프레임으로 조정하고 오차를 제시해 합의했다.
 
-검토되었던 대안으로는 별도의 Camera Track을 Sequencer에 직접 추가하는 방식이 있었다. 이 방식은 구현은 빠르지만, 제품 고유의 데이터 모델과 엔진 데이터가 강하게 결합되어 Unreal Engine 업데이트 시 유지보수 부담이 컸을 것이다.
+**2인 이상 샷(OTS).** 기준 피사체 선정 + Restriction Rule. **Obstacle.** 안면부 ROI LineTrace. **Off-screen Evaluation.** Stable Pose Detector로 애니메이션 안정화.
 
-트레이드오프로 Camera 관련 연산의 일부를 엔진 기능에 의존하는 대신, 데이터 저장 및 편집 구조는 독립적인 레이어로 분리했다. 엔진 업데이트 시 Camera Actor의 API 변경은 대응해야 하지만, 데이터 모델 자체는 영향을 받지 않는 구조가 되었다.
+### LLM Content Pipeline
 
-### LLM 연동을 위한 동기 HTTP 통신 처리
+3계층 구조로 분리: **Frontend(Web)** → 사용자 프롬프트 수신/LLM 요청, **Backend** → LLM 응답 정제/저장/CLI 실행, **Client(Unreal Engine CLI)** → JSON 기반 레벨 로드/Actor 생성배치/타임라인 구성.
 
-LLM과의 통신은 HTTP 요청을 통해 이루어졌다. Unreal Engine의 HTTP 모듈은 기본적으로 비동기 콜백 기반이지만, LLM 호출 후 그 결과를 기다렸다가 다음 처리로 이어져야 하는 제작 파이프라인의 특성상 동기(blocking) 방식의 HTTP 요청 처리가 필요했다.
+JSON은 Asset, 배치 위치, 시점별 타임라인 구성을 **Tag/Alias**로 지정하고, 클라이언트는 **DataTable** Lookup으로 수행했다. Unreal Engine HTTP 모듈의 Async Callback을 스레드 대기 방식으로 동기 래핑하여 순차 처리했다.
 
-비동기 HTTP 요청의 콜백에서 결과가 도착할 때까지 스레드를 대기시키는 방식으로 동기 호출을 구현했다. LLM 응답을 수신한 후 JSON 파싱 → Shot Sequence 생성으로 이어지는 일련의 처리를 순차적으로 수행할 수 있도록 했다.
+### UE5 마이그레이션
 
-### AI 기능의 파이프라인 통합
+UE5에서 `SetPlayPosition`이 더 이상 즉시 Scene 상태를 업데이트하지 않아, `EvaluateSynchronousBlocking`을 `SetHasJumped(true)` 컨텍스트로 호출하는 Interrogator를 구현했다. Skeletal Mesh Double Buffering 문제로 첫 평가는 두 번 수행했고, 평가 후 `EvaluateAllConstraints`로 IK 등의 Constraint를 적용했다. 주요 Socket(pelvis, hand_l/r, index_finger_l/r) 기준 Pose 변화를 감지하여 수렴할 때까지 반복 평가하는 **Stable Pose Detector**를 함께 구현했다.
 
-LLM 및 학습 모델의 출력을 제작 데이터로 변환하는 과정에서 가장 중점을 둔 것은 "사람이 검토하고 수정할 수 있는 형태"로 만드는 것이었다. AI가 생성한 결과를 그대로 사용하는 것이 아니라, Sequence 데이터로 변환하여 편집 가능한 상태로 제공함으로써 사람의 판단을 중간에 넣을 수 있도록 했다.
+### Grouped Action System
 
-LLM Function Calling은 AI 모델의 출력을 JSON 형태의 구조화된 명령으로 변환하는 데 사용했다. 이 명령을 Sequence 생성 명령어로 매핑하여, 텍스트 프롬프트에서 콘텐츠 제작까지의 흐름을 연결했다.
-
-### UE5 마이그레이션: MovieScene 갱신 방식 변경
-
-Unreal Engine 4에서 5로 전환되면서 SequencePlayer의 동작 방식이 크게 변경되었다. 가장 큰 차이는 UE5에서 SequencePlayer의 업데이트 메커니즘이 거의 완전히 비동기화된 점이었다.
-
-기존 UE4에서는 특정 시간대에 맞춰 계산이 필요할 때 `ForceEvaluate`를 사용하여 Scene을 강제로 갱신할 수 있었다. UE5에서는 이 함수가 더 이상 의도한 대로 동작하지 않았다. 문제 해결을 위해 Scene을 명시적으로 갱신하는 우회 구현을 찾아 적용했다.
-
-이 과정에서 기존 코드에서 습관적으로 과다 사용되던 `SetPlayPosition` 호출을 제거하는 긍정적 부수 효과도 있었다. 다만 최종 애니메이션 업데이트 타이밍이 기대보다 늦게 적용되는 문제(PostEval 시점)가 있어 추가적인 처리가 필요했다.
-
-### Grouped Action System 설계
-
-캐릭터 애니메이션을 적용하기 위한 기능 모듈로, 각 Action 그룹마다 서로 다른 매개변수와 실행 타이밍을 가진다. 단일 구조로 모든 Action을 지원하기 어려웠기 때문에, 각 Grouped Action을 콘텐츠를 정의하는 작은 Scene 단위로 접근했다.
-
-Plugin 형태의 Asset Type으로 개발되었으며, 데이터 형식은 GameplayTags만으로 조작 가능하도록 설계했다. 이를 통해 Action이 다른 계산이나 커스텀 로직으로부터 독립적으로 동작할 수 있게 했다.
-
-상세 기획 단계 이전에 POC를 담당하여 기획, 설계, 검증까지 완료했다. POC 성공 완료 후 프로젝트 팀에 이관하였으며, 전용 에디터 개발은 인계 후 진행될 예정이었다.
+두 캐릭터 이상의 애니메이션을 간편하게 배치하기 위한 시스템. 쌍으로 촬영된 **Animation Pair** 데이터에서 시작 지점의 **Relative Transform**을 도출하여, 사용자가 UI에서 원하는 위치를 지정하면 두 캐릭터의 Transform을 계산하고 타임라인에 같은 시점에 시퀀스를 삽입했다.
 
 ### CLI 기반 렌더링 파이프라인
 
-MovieRenderQueue를 CLI(Command Line Interface) 환경에서 구동하고, Web API를 통해 LevelSequence 렌더링을 요청할 수 있는 파이프라인을 구축했다.
+2단계 Sequence 구조(SceneSequence/RenderSequence)로 설계했다. MRQ Commandlet 환경에서 RenderSequence를 소스로 멀티 Scene 렌더링을 수행했으며, Camera Candidate Template 렌더링도 포함했다.
 
-이 과정에서 두 가지 문제가 있었다.
+**Lumen Warm-up.** 조명 안정화를 위해 약 1초 분량의 Warm-up 프레임을 MRQ 파이프라인에 설정했다.
 
-**컷 전환 시점의 Motion Blur 문제.** Shot Sequence에서 컷이 전환되는 시점에 Motion Blur가 의도치 않게 적용되어 다음 Shot의 첫 프레임이 번져 보이는 현상이 발생했다. 컷 전환 타이밍에 Motion Blur 설정을 일시적으로 비활성화하는 방식으로 처리되었다.
+**Motion Blur.** 연속 Section 배치로 인한 카메라 컷 시작 지점의 Transform/FOV Jump가 원인이었다. 1차로 카메라 클립별 독립 트랙을 생성했으나 UObject 생성/소멸 급증으로 GC 비용이 감당 불가능해져, 최종적으로 카메라 클립 앞쪽을 **1프레임만 Stretch**하여 **지그재그로 배치**하는 Track Optimization으로 해결했다.
 
-**Lumen 조명이 적용된 Screen Snapshot.** 제품 파이프라인에서 사용할 Snapshot 이미지에는 완전한 Lumen 조명이 적용된 상태여야 했다. 일반적인 Screen Capture로는 Lumen 최종 조명 결과를 얻을 수 없어, 렌더링 파이프라인 내에서 조명 계산이 완료된 시점을 캡처하도록 처리되었다.
+**오디오.** 오디오 렌더를 분리 Export한 후 FFMPEG로 클립별 Mux 처리했다.
 
 ---
 
@@ -192,25 +178,19 @@ MovieRenderQueue를 CLI(Command Line Interface) 환경에서 구동하고, Web A
 
 ## 결과
 
-- Unreal Engine 기반 영상 제작도구의 핵심 기능 설계 및 안정화
-- Camera Direction System을 통한 제작 워크플로우 개선 (Shot 정의, AutoCamera)
-- LLM 및 AI 모델 연동으로 텍스트 기반 콘텐츠 생성 파이프라인 확보
-- AI 생성 결과물을 제작 데이터로 변환하여 편집 가능한 형태로 통합
-- UE4→UE5 마이그레이션 대응 및 MovieScene 갱신 문제 해결
-- CLI 기반 MovieRenderQueue 파이프라인 구축
-- 기능 확장 가능성을 고려한 데이터 모델 분리 구조 적용
-- Git 기반 브랜치 전략 및 CI/CD 파이프라인 운영 체계 구축
+- Camera Direction System 구축 (Template Library, Black-eye 연동, OTS/Obstacle 대응)
+- UE5 마이그레이션 대응 (EvaluateSynchronousBlocking 우회, Stable Pose Detector)
+- CLI 기반 MRQ 렌더링 파이프라인 구축 (Scene/RenderSequence 분리, Motion Blur Track Optimization, Lumen Warm-up, Audio Mux)
+- LLM 3계층 콘텐츠 생성 파이프라인 구축 (Frontend/Backend/Client CLI, DataTable Lookup)
+- Grouped Action System POC (Animation Pair, Relative Transform)
+- Git 브랜치 전략 및 CI/CD 파이프라인 운영 체계 구축
 
 ---
 
 ## 회고
 
-Unreal Engine을 제품의 코어로 사용하면서, 엔진 업데이트에 따른 영향을 최소화하는 구조를 유지하는 것이 가장 어려운 부분이었다. 특히 UE4에서 UE5로의 전환은 단순한 버전 업이 아니라 SequencePlayer의 동작 방식 자체가 바뀌는 근본적인 변화였고, 이에 대한 대응이 프로젝트 일정에 큰 영향을 주었다.
+UE4에서 UE5로의 전환은 단순한 버전 업이 아니라 SequencePlayer의 동작 방식 자체가 바뀌는 근본적인 변화였고, `EvaluateSynchronousBlocking` 우회 구현이 프로젝트 일정에 큰 영향을 주었다.
 
-AI 기능 통합 부분에서는 모델의 출력 품질보다 "출력을 어떻게 제작 파이프라인에 통합할 것인가"에 더 중점을 두었다. 이 접근은 결과물을 사람이 편집하고 조정할 수 있게 하여, AI 생성 결과의 불완전성을 보완할 수 있는 구조가 되었다.
+AI 기능 통합은 모델 출력 품질보다 "출력을 어떻게 제작 파이프라인에 통합할 것인가"에 중점을 두었고, 이 접근은 결과물을 편집 가능하게 만들어 AI 생성 결과의 불완전성을 보완하는 구조가 되었다.
 
-Grouped Action System은 POC까지 완료하고 이관했으나, 전용 에디터가 완성되지 않은 점은 아쉬움으로 남는다. GameplayTags 기반의 데이터 형식은 유연했지만, 시각적인 편집 도구가 없으면 실제 사용성이 크게 떨어지기 때문이다.
-
-프로젝트 방향성은 LLM으로 장면(Scene)을 구성하고 실제 3D Asset을 기반으로 영상 소스를 생성하는 방식이었다. 당시 대부분의 영상 생성 서비스들이 LLM을 통해 직접 영상을 생성하는 방향과 비교하면 차별화되는 지점이었다. 이후 AI 영상 후보정 기술의 발전에 따라 프로젝트의 접근 방식이 점차 설득력을 얻었고, 수작업으로 제작되던 3D Asset은 외부 Resource import, 모션 및 배경 생성 단계로 진화하며 완전한 생성 서비스로 수렴하는 흐름을 보였다.
-
-프로젝트는 주요 기능이 동작 가능한 단계까지 진행되었으나, 사업 환경 변화로 인해 서비스 안정화와 파이프라인 통합을 완료하기 전 마무리되었다. 이 경험을 통해 기술적 타당성과 제품화 단계의 리스크가 별도로 관리되어야 한다는 점을 체감했다.
+Grouped Action System은 POC까지 완료하고 이관했으나, 회사 구조조정으로 실제 제품 적용까지는 도달하지 못했다. 기술적 타당성과 제품화 단계의 리스크는 별도로 관리되어야 한다는 점을 체감했다.

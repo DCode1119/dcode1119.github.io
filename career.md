@@ -82,27 +82,31 @@ CINEV 서비스의 내부 3D 영상 콘텐츠 제작 엔진. 사용자의 텍스
 
 #### 주요 설계 및 구현
 
-**Camera Direction System.** 영화 촬영 이론의 구도, 앵글, 움직임 유형을 파라미터화하여 Shot 단위로 정의했다. AutoCamera는 이 Shot 정의와 장면 맥락을 입력받아 적절한 카메라 방향을 결정하는 규칙 기반 시스템으로, LLM이 결정한 Shot 의도를 실제 카메라 움직임으로 변환하는 중간 계층 역할을 한다.
+**Camera Direction System.** 초기 Shot은 피사체 크기(1~9 양자화)와 피사체 기준 상대 Yaw/Pitch/FOV로 정의되었다. 연출/영상제작 직군의 대표적인 카메라 샷들로부터 파라미터를 역산하여 **Template Library**(DataTable, 30~300개 가변)로 구축하고 Tag(샷사이즈/방향/높이 3집합 조합)를 부여했다.
 
-카메라 데이터를 Sequence Keyframe 구조로 일반화하여 저장하고, Unreal Engine의 Camera Actor/Spline과 결합했다. 데이터 모델과 엔진 데이터를 분리하여 UE4→UE5 마이그레이션 시 Camera Data Model 자체는 영향을 받지 않는 구조를 유지했다.
+이후 **Black-eye Plugin** 도입으로 Shot Size 양자화는 **DesiredViewSize**(1~100 float, 피사체 화면 점유율 %)로 대체되었다. Black-eye는 Non-deterministic한 Tick base Damping 계산으로 MRQ의 Deterministic Sequence 재현이 어려웠으나, PoC 단계에서 취약점을 보고한 후 플러그인 사용이 결정되어 Tick base 시뮬레이션 → Sampling → 일반 카메라 타임라인 적용 방식으로 우회했다. Sampling 간격은 매 프레임에서 3프레임으로 조정하고 오차를 제시해 합의했으며, 파라미터화하여 추후 수정 가능하게 설계했다.
 
-**LLM 연동 및 AI 파이프라인.** LLM Function Calling을 활용해 AI 출력을 구조화된 제작 명령어로 변환했다. AI 생성 결과를 Sequence 데이터로 변환하여 편집 가능한 형태로 제공함으로써, 사람이 검토하고 수정할 수 있도록 했다. AI 결과의 불완전성을 보완하는 구조적 접근을 선택했다.
+**2인 이상 샷(OTS) 대응.** 기준 피사체를 선정하여 방향/Orient 기준을 설정하고, 피사체 간 거리/방향에 따른 **Restriction Rule**을 추가했다. **Obstacle 대응**으로 피사체 안면부 ROI 기준 카메라 LineTrace로 가려짐을 판정했다.
 
-동기 HTTP 통신이 필요한 LLM 호출 특성상, Unreal Engine의 비동기 HTTP 모듈을 콜백에서 스레드 대기 방식으로 래핑하여 순차적 처리 파이프라인을 구현했다.
+**Off-screen Sequence Evaluation.** 카메라 계산이 Off-screen에서 이루어져야 했으므로, 요청 Tick에 Sequence를 갱신하고 Tick 기반 애니메이션을 안정화하여 특정 프레임의 정확한 캐릭터 모션을 도출했다.
 
-**UE5 마이그레이션 대응.** UE4에서 UE5로 전환 시 SequencePlayer 업데이트 메커니즘이 근본적으로 변경되었다. UE4의 `ForceEvaluate`가 UE5에서 의도대로 동작하지 않아, Scene을 명시적으로 갱신하는 우회 구현을 적용했다. 이 과정에서 과다 사용되던 `SetPlayPosition` 호출을 제거하는 부수 효과도 있었다.
+**UE5 마이그레이션 대응.** UE5에서 `SetPlayPosition`이 더 이상 즉시 Scene 상태를 업데이트하지 않아, `EvaluateSynchronousBlocking`을 `SetHasJumped(true)` 컨텍스트로 호출하는 Interrogator를 구현했다. Skeletal Mesh Double Buffering 문제로 첫 평가는 두 번 수행했고, 평가 후 `EvaluateAllConstraints`로 IK 등의 Constraint를 적용했다. 주요 Socket(pelvis, hand_l/r, index_finger_l/r) 기준 Pose 변화를 감지하여 수렴할 때까지 반복 평가하는 **Stable Pose Detector**를 함께 구현했다.
 
-**CLI 기반 렌더링 파이프라인.** MovieRenderQueue를 CLI에서 구동하고 Web API를 통해 LevelSequence 렌더링을 요청하는 구조를 구축했다. 컷 전환 시점 Motion Blur 문제와 Lumen 조명 Snapshot 문제를 해결했다.
+**CLI 기반 렌더링 파이프라인.** Actor 배치/애니메이션을 위한 **SceneSequence**와 카메라 컷 배치/렌더링을 위한 **RenderSequence**(UMovieSceneShotTrack)로 2단계 분리했다. MRQ는 RenderSequence를 소스로 멀티 Scene 렌더링을 수행했다. Lumen 조명 안정화를 위해 약 1초 분량 Warm-up을 MRQ 파이프라인에 설정했다.
 
-**Grouped Action System.** 캐릭터 애니메이션 관리 모듈로, 각 Action을 GameplayTags 기반의 Plugin Asset Type으로 설계했다. POC 완료 후 팀에 이관했다.
+Motion Blur는 연속 Section 배치로 인한 카메라 컷 시작 지점의 Transform/FOV Jump가 원인이었다. 1차로 카메라 클립별 독립 트랙을 생성했으나 UObject 생성/소멸 급증으로 **GC 비용이 감당 불가능**해져, 최종적으로 카메라 클립 앞쪽을 **1프레임만 Stretch**하여 **지그재그로 배치**하는 Track Optimization으로 해결했다. 오디오는 분리 Export 후 FFMPEG로 클립별 Mux 처리했다.
+
+**Grouped Action System.** 두 캐릭터 이상의 애니메이션을 간편하게 배치하기 위한 시스템. 쌍으로 촬영된 **Animation Pair** 데이터에서 시작 지점의 **Relative Transform**을 도출하여, UI에서 위치를 지정하면 두 캐릭터의 Transform을 계산하고 타임라인에 같은 시점에 시퀀스를 삽입했다. POC 완료 후 팀에 이관했으며, 재입사 후 재담당했으나 회사 구조조정으로 실제 제품 적용까지는 도달하지 못했다.
+
+**LLM Content Pipeline.** 3계층(Frontend/Backend/Client CLI) 구조. JSON은 사용할 Asset, 배치 위치, 시점별 타임라인 구성을 **Tag/Alias**로 지정하고, 클라이언트는 **DataTable** Lookup으로 수행했다. Unreal Engine HTTP 모듈의 Async Callback을 스레드 대기 방식으로 동기 래핑하여 순차 처리했다.
 
 #### 결과
 
-- Camera Direction System을 통한 제작 워크플로우 개선
-- LLM 및 AI 모델 연동으로 텍스트 기반 콘텐츠 생성 파이프라인 확보
-- AI 생성 결과물을 편집 가능한 제작 데이터로 통합하는 구조 적용
-- UE4→UE5 마이그레이션 대응 및 MovieScene 갱신 문제 해결
-- CLI 기반 MovieRenderQueue 파이프라인 구축
+- Camera Direction System 구축 (Template Library, Black-eye 연동, OTS/Obstacle 대응)
+- UE5 마이그레이션 대응 (EvaluateSynchronousBlocking, Stable Pose Detector)
+- CLI 기반 MRQ 렌더링 파이프라인 구축 (Motion Blur, Lumen Warm-up, GC Optimization, Audio Mux)
+- LLM 3계층 콘텐츠 생성 파이프라인 구축
+- Grouped Action System POC
 - Git 브랜치 전략 및 CI/CD 파이프라인 운영 체계 구축
 
 ---
